@@ -1,2 +1,7 @@
+# compiled files:
 *.o
 program
+
+# OSX shit:
+.DS_Store
+*.dSYM

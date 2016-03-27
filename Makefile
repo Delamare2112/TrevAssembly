@@ -1,4 +1,4 @@
 all:
 	@echo "Compiling..."
-	@clang++ -g -std=c++14 *.cpp -o program
+	@clang++ -Werror=return-type -g -std=c++14 *.cpp -o program
 	@echo "done"
