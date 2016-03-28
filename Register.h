@@ -6,6 +6,7 @@ class Register
 {
 private:
 	static std::unordered_map<std::string, Register> registers;
+	static Register dummyReg;
 
 	size_t size;
 	bool internallyAllocated;

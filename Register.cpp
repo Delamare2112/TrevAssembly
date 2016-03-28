@@ -1,6 +1,7 @@
 #include "Register.h"
 
 std::unordered_map<std::string, Register> Register::registers;
+Register Register::dummyReg = Register(4);
 
 Register::Register(size_t size, uint32_t* addr)
 {
@@ -88,7 +89,8 @@ Register& Register::GetReg(std::string regname)
 	auto regIter = registers.find(regname);
 	if(regIter != registers.end())
 		return regIter->second;
-	throw regname + " could not be found";
+	std::cout << "Register with name '" << regname + "' could not be found\n";
+	return Register::dummyReg;
 }
 
 std::ostream& operator<<(std::ostream& os, const Register& reg)
