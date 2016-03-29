@@ -3,6 +3,12 @@
 #include <regex>
 #include <vector>
 #include <cctype>
+#include <functional>
+
+#define OP_PARAM_TYPE const std::vector<std::string>&
+#define OP_PARAMS OP_PARAM_TYPE args
+#define OP_RET void
+#define CREATE_OP_SIG(name) OP_RET name (OP_PARAMS)
 
 bool verbose = 0;
 
@@ -17,18 +23,40 @@ size_t GetBytesNeeded(uint val)
 	return 0;
 }
 
-void mov(std::string dest, uint32_t val)
+void _mov(std::string dest, uint32_t val)
 {
 	Register& reg = Register::GetReg(dest);
 	if(reg.GetSize() < GetBytesNeeded(val))
 		std::cout << 	"lhs(" + dest + ") and rhs(" + std::to_string(val) + ") must be of compatible size.\n"
-						"lhs and rhs are of size " + std::to_string(reg.GetSize()) + " and " + std::to_string(GetBytesNeeded(val)) + " bytes respecively.";
+						"lhs and rhs are of size " + std::to_string(reg.GetSize()) + " and " + std::to_string(GetBytesNeeded(val)) + " bytes respecively.\n";
 	reg.SetVal(val);
 }
 
-void mov(std::string dest, std::string src)
+void _mov(std::string dest, std::string src)
 {
-	mov(dest, Register::GetReg(src).GetValue());
+	_mov(dest, Register::GetReg(src).GetValue());
+}
+
+// void mov(const std::vector<std::string>& args)
+CREATE_OP_SIG(mov)
+{
+	if(args.size() != 2)
+	{
+		std::cout << "\nError: mov takes 2 arguments. mov [reg/mem], [reg/mem/val]\n";
+		return;
+	}
+	if(std::isdigit(args[1][0])) // is first character a number?
+		_mov(args[0], std::stoi(args[1]));
+	else
+		_mov(args[0], args[1]);
+}
+
+CREATE_OP_SIG(dump)
+{
+	std::cout << Register::GetReg("eax") << '\n';
+	std::cout << Register::GetReg("ebx") << '\n';
+	std::cout << Register::GetReg("ecx") << '\n';
+	std::cout << Register::GetReg("edx") << '\n';
 }
 
 struct Command
@@ -61,15 +89,18 @@ Command GetCommand()
 }
 
 std::unordered_map<std::string, std::vector<uint8_t>> opcodes;
+std::unordered_map<std::string, std::function<OP_RET(OP_PARAM_TYPE)>> ops;
 
 int main(int argc, char* argv[])
 {
-	opcodes["mov"].push_back(0x88);
-	opcodes["mov"].push_back(0x89);
-	opcodes["mov"].push_back(0x8A);
-	opcodes["mov"].push_back(0x8B);
-	opcodes["mov"].push_back(0x8C);
-	opcodes["mov"].push_back(0x8E);
+	ops["0x88"] = mov;
+	ops["0x89"] = mov;
+	ops["0x8A"] = mov;
+	ops["0x8B"] = mov;
+	ops["0x8C"] = mov;
+	ops["0x8E"] = mov;
+	ops["mov"] = mov;
+	ops["dump"] = dump;
 
 	if(argc > 1)
 	{
@@ -91,25 +122,19 @@ int main(int argc, char* argv[])
 	do
 	{
 		userInput = GetCommand();
-		if(userInput.op == "mov")
-		{
-			if(userInput.args.size() != 2)
-			{
-				std::cout << "\nError: mov takes 2 arguments. mov [reg/mem], [reg/mem/val]\n";
-				continue;
-			}
-			if(std::isdigit(userInput.args[1][0])) // is first character a number?
-				mov(userInput.args[0], std::stoi(userInput.args[1]));
-			else
-				mov(userInput.args[0], userInput.args[1]);
-		}
-		else if(userInput.op == "dump")
-		{
-			std::cout << Register::GetReg("eax") << '\n';
-			std::cout << Register::GetReg("ax") << '\n';
-			std::cout << Register::GetReg("ah") << '\n';
-			std::cout << Register::GetReg("al") << '\n';
-		}
+		auto opItter = ops.find(userInput.op);
+		if(opItter != ops.end())
+			opItter->second(userInput.args);
+		else
+			std::cout << userInput.op << " not found.\n";
+		// if(userInput.op == "mov")
+		// {
+		// 	mov(userInput.args);
+		// }
+		// else if(userInput.op == "dump")
+		// {
+		// 	dump(userInput.args);
+		// }
 
 	}while (userInput.raw != "exit");
 
