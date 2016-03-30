@@ -1,32 +1,21 @@
 #include "Commands.h"
-#include "Register.h"
 #include <cctype>
 #include <regex>
 
-#define ADD_OP(str, name) ops[str] = (void(*)(OP_PARAM_TYPE))&name;
+size_t GetBytesNeeded(uint val)
+{
+	if(val == (uint8_t)val)
+		return 1;
+	if(val == (uint16_t)val)
+		return 2;
+	if(val == (uint32_t)val)
+		return 4;
+	return 0;
+}
 
 namespace Commands
 {
-	size_t GetBytesNeeded(uint val)
-	{
-		if(val == (uint8_t)val)
-			return 1;
-		if(val == (uint16_t)val)
-			return 2;
-		if(val == (uint32_t)val)
-			return 4;
-		return 0;
-	}
-
-	void Command::Execute()
-	{
-		auto opItter = Commands::ops.find(op);
-		if(opItter != Commands::ops.end())
-			opItter->second(args);
-		else
-			std::cout << op << " not found.\n";
-	}
-
+	Command Command::currentCommand;
 	std::unordered_map<std::string, std::function<void(OP_PARAM_TYPE)>> ops;
 
 	Command GetCommand()
@@ -45,13 +34,27 @@ namespace Commands
 		return retCommand;
 	}
 
+	void Command::Execute()
+	{
+		auto opItter = Commands::ops.find(op);
+		if(opItter != Commands::ops.end())
+			opItter->second(args);
+		else
+			std::cout << op << " not found.\n";
+	}
+
+	void mov(Register& dest, uint32_t val)
+	{
+		if(dest.GetSize() < GetBytesNeeded(val))
+			std::cout << 	"lhs(" + Command::currentCommand.args[0] + ") and rhs(" + std::to_string(val) + ") must be of compatible size.\n"
+							"lhs and rhs are of size " + std::to_string(dest.GetSize()) + " and " + std::to_string(GetBytesNeeded(val)) + " bytes respecively.\n";
+		else
+			dest.SetVal(val);
+	}
+
 	void mov(std::string dest, uint32_t val)
 	{
-		Register& reg = Register::GetReg(dest);
-		if(reg.GetSize() < GetBytesNeeded(val))
-			std::cout << 	"lhs(" + dest + ") and rhs(" + std::to_string(val) + ") must be of compatible size.\n"
-							"lhs and rhs are of size " + std::to_string(reg.GetSize()) + " and " + std::to_string(GetBytesNeeded(val)) + " bytes respecively.\n";
-		reg.SetVal(val);
+		mov(Register::GetReg(dest), val);
 	}
 
 	void mov(std::string dest, std::string src)

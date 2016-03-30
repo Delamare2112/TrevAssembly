@@ -1,17 +1,19 @@
 #include "Register.h"
-#include "Commands.h"
+#include "ALU.h"
+
+using Commands::Command;
 
 int main(int argc, char* argv[])
 {
 	Commands::Init();
+	Commands::ALU::Init();
 	Register::Init();
-	Commands::Command userInput;
 	std::cout << "Welcome to TrevAssembly! Plz enter asm commands!\n";
 	do
 	{
-		userInput = Commands::GetCommand();
-		userInput.Execute();
+		Command::currentCommand = Commands::GetCommand();
+		Command::currentCommand.Execute();
 
-	}while (userInput.op != "exit");
+	}while (Command::currentCommand.op != "exit");
 	return 0;
 }

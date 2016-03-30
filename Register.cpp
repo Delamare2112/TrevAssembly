@@ -1,7 +1,7 @@
 #include "Register.h"
 
 std::unordered_map<std::string, Register> Register::registers;
-Register Register::dummyReg = Register(4);
+Register Register::dummyReg = Register(0);
 
 Register::Register(size_t size, uint32_t* addr)
 {
