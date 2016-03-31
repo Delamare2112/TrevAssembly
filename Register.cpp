@@ -2,6 +2,7 @@
 
 std::unordered_map<std::string, Register> Register::registers;
 Register Register::dummyReg = Register(0);
+Register Register::flags = Register(2);
 
 Register::Register(size_t size, uint32_t* addr)
 {
@@ -77,6 +78,11 @@ uint32_t Register::GetValue() const
 		return (uint32_t)*value;
 	}
 	return 0;
+}
+
+bool Register::GetBit(uint8_t bit)
+{
+	return *value & (1 << bit);
 }
 
 size_t Register::GetSize() 
