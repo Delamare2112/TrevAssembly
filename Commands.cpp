@@ -49,7 +49,7 @@ namespace Commands
 			std::cout << 	"lhs(" + Command::currentCommand.args[0] + ") and rhs(" + std::to_string(val) + ") must be of compatible size.\n"
 							"lhs and rhs are of size " + std::to_string(dest.GetSize()) + " and " + std::to_string(GetBytesNeeded(val)) + " bytes respecively.\n";
 		else
-			dest.SetVal(val);
+			dest.SetValue(val);
 	}
 
 	void mov(std::string dest, uint32_t val)
@@ -81,6 +81,7 @@ namespace Commands
 		std::cout << Register::GetReg("ebx") << '\n';
 		std::cout << Register::GetReg("ecx") << '\n';
 		std::cout << Register::GetReg("edx") << '\n';
+		std::cout << Register::flags << '\n';
 	}
 
 	void exit(OP_PARAM_TYPE args)

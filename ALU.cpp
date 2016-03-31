@@ -1,10 +1,24 @@
 #include "ALU.h"
+#include <cmath>
 
 namespace Commands { namespace ALU
 {
 	void add(std::string dest, uint32_t val)
 	{
-		mov(dest, val + Register::GetReg(dest).GetValue());
+		Register& destReg = Register::GetReg(dest);
+		uint32_t sum = val + destReg.GetValue();
+
+		// I don't just (int32_t) because size matters.
+		bool destSigned = destReg.GetBit((destReg.GetSize() * 8) - 1); // is the dest reg neg when signed
+		bool valSigned = val & (1 << ((destReg.GetSize() * 8) - 1));   // is the src val neg when signed
+		bool sumSigned = sum & (1 << ((destReg.GetSize() * 8) - 1));   // is the sum neg when signed
+		bool overflow = (destSigned && valSigned && !sumSigned) || (!destSigned && !valSigned && sumSigned);
+		bool carry = (uint64_t)destReg.GetValue() + (uint64_t)val != (destReg.FitToSize(sum));
+
+		Register::flags.SetBit(FlagMask::overflow, overflow);
+		Register::flags.SetBit(FlagMask::carry, carry);
+
+		mov(destReg, destReg.FitToSize(sum));
 	}
 
 	void add(std::string dest, std::string src)
@@ -27,7 +41,21 @@ namespace Commands { namespace ALU
 
 	void sub(std::string dest, uint32_t val)
 	{
-		mov(dest, val - Register::GetReg(dest).GetValue());
+		// mov(dest, val - Register::GetReg(dest).GetValue());
+		Register& destReg = Register::GetReg(dest);
+		uint32_t difference = destReg.GetValue() - val;
+
+		// I don't just (int32_t) because size matters.
+		bool destSigned = destReg.GetBit((destReg.GetSize() * 8) - 1); // is the dest reg neg when signed
+		bool valSigned = val & (1 << ((destReg.GetSize() * 8) - 1));   // is the src val neg when signed
+		bool differenceSigned = difference & (1 << ((destReg.GetSize() * 8) - 1));   // is the difference neg when signed
+		bool overflow = (!destSigned && valSigned && differenceSigned) || (destSigned && !valSigned && !differenceSigned);
+		bool carry = (uint64_t)destReg.GetValue() - (uint64_t)val != (destReg.FitToSize(difference));
+
+		Register::flags.SetBit(FlagMask::overflow, overflow);
+		Register::flags.SetBit(FlagMask::carry, carry);
+
+		mov(destReg, destReg.FitToSize(difference));
 	}
 
 	void sub(std::string dest, std::string src)

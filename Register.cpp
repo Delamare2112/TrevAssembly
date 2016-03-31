@@ -53,7 +53,7 @@ uint32_t* Register::GetAddr()
 	return value;
 }
 
-void Register::SetVal(uint32_t val)
+void Register::SetValue(uint32_t val)
 {
 	switch(size)
 	{
@@ -85,9 +85,27 @@ bool Register::GetBit(uint8_t bit)
 	return *value & (1 << bit);
 }
 
+void Register::SetBit(uint8_t index, bool value)
+{
+	if(value)
+		SetValue(GetValue() | (1 << index));
+	else
+		SetValue(GetValue() & ~(1 << index));
+}
+
+uint32_t Register::GetMaxValue()
+{
+	return (uint32_t)(std::pow(2, GetSize() * 8) - 1);
+}
+
 size_t Register::GetSize() 
 {
 	return size;
+}
+
+uint32_t Register::FitToSize(uint32_t value)
+{
+	return value & GetMaxValue();
 }
 
 Register& Register::GetReg(std::string regname)

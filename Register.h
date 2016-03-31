@@ -21,13 +21,13 @@ class Register
 private:
 	static std::unordered_map<std::string, Register> registers;
 	static Register dummyReg;
-	static Register flags;
 
 	size_t size;
 	bool internallyAllocated;
 	uint32_t* value;
 
 public:
+	static Register flags;
 
 	Register(size_t size = 4, uint32_t* addr = nullptr);
 
@@ -37,13 +37,19 @@ public:
 
 	uint32_t* GetAddr();
 
-	void SetVal(uint32_t val);
+	void SetValue(uint32_t val);
 
 	uint32_t GetValue() const;
 
 	bool GetBit(uint8_t bit);
 
+	void SetBit(uint8_t index, bool value);
+
+	uint32_t GetMaxValue();
+
 	size_t GetSize();
+
+	uint32_t FitToSize(uint32_t value);
 
 	static Register& GetReg(std::string regname);
 

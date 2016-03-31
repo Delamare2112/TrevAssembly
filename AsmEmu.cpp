@@ -9,6 +9,9 @@ int main(int argc, char* argv[])
 	Commands::ALU::Init();
 	Register::Init();
 	std::cout << "Welcome to TrevAssembly! Plz enter asm commands!\n";
+	// Commands::mov("eax", 1<<7);
+	// std::cout << (1<<7) << '\n';
+	// std::cout << Register::registers["eax"].GetBit((Register::registers["al"].GetSize() *  8) - 1) << '\n';
 	do
 	{
 		Command::currentCommand = Commands::GetCommand();
