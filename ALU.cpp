@@ -3,6 +3,15 @@
 
 namespace Commands { namespace ALU
 {
+	bool CheckParity(uint8_t bits)
+	{
+		bool even = 1;
+		for(uint8_t i = 0; i < 8; i++)
+			if(bits & (1<<i))
+				even = !even;
+		return even;
+	}
+
 	void add(std::string dest, uint32_t val)
 	{
 		Register& destReg = Register::GetReg(dest);
@@ -17,6 +26,9 @@ namespace Commands { namespace ALU
 
 		Register::flags.SetBit(FlagMask::overflow, overflow);
 		Register::flags.SetBit(FlagMask::carry, carry);
+		Register::flags.SetBit(FlagMask::sign, sumSigned);
+		Register::flags.SetBit(FlagMask::parity, CheckParity(sum));
+		Register::flags.SetBit(FlagMask::zero, sum == 0);
 
 		mov(destReg, destReg.FitToSize(sum));
 	}
@@ -54,6 +66,9 @@ namespace Commands { namespace ALU
 
 		Register::flags.SetBit(FlagMask::overflow, overflow);
 		Register::flags.SetBit(FlagMask::carry, carry);
+		Register::flags.SetBit(FlagMask::sign, differenceSigned);
+		Register::flags.SetBit(FlagMask::parity, CheckParity(difference));
+		Register::flags.SetBit(FlagMask::zero, difference == 0);
 
 		mov(destReg, destReg.FitToSize(difference));
 	}
@@ -76,9 +91,23 @@ namespace Commands { namespace ALU
 			sub(args[0], args[1]);
 	}
 
+	void cld(OP_PARAM_TYPE args)
+	{
+		Register::flags.SetBit(FlagMask::direction, 0);
+	}
+
+	void std(OP_PARAM_TYPE args)
+	{
+		Register::flags.SetBit(FlagMask::direction, 1);
+	}
+
 	void Init()
 	{
+		Register::flags.SetBit(FlagMask::parity, 1);
+		Register::flags.SetBit(FlagMask::zero, 1);
 		ADD_OP("add", add);
 		ADD_OP("sub", sub);
+		ADD_OP("cld", cld);
+		ADD_OP("std", std);
 	}
 }}
