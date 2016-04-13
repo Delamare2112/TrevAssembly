@@ -2,7 +2,7 @@
 #include <cctype>
 #include <regex>
 
-size_t GetBytesNeeded(uint val)
+size_t GetBytesNeeded(uint32_t val)
 {
 	if(val == (uint8_t)val)
 		return 1;
@@ -17,6 +17,7 @@ namespace Commands
 {
 	Command Command::currentCommand;
 	std::unordered_map<std::string, std::function<void(OP_PARAM_TYPE)>> ops;
+	std::vector<Command> commandHistory;
 
 	Command GetCommand()
 	{
@@ -31,6 +32,7 @@ namespace Commands
 			if(matches[i] != "")
 				retCommand.args.push_back(matches[i]);
 		}
+		commandHistory.push_back(retCommand);
 		return retCommand;
 	}
 

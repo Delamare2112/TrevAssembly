@@ -1,4 +1,5 @@
 #include "Register.h"
+#include <cmath>
 
 std::unordered_map<std::string, Register> Register::registers;
 Register Register::dummyReg = Register(0);
@@ -17,6 +18,7 @@ Register::Register(size_t size, uint32_t* addr)
 		internallyAllocated = false;
 	}
 	value = addr;
+	*value = 0;
 }
 
 Register::~Register()
