@@ -5,8 +5,8 @@
 #include <unordered_map>
 #include "Register.h"
 
-#define ADD_OP(str, name) ops[str] = (void(*)(OP_PARAM_TYPE))&name;
 #define OP_PARAM_TYPE const std::vector<std::string>&
+#define ADD_OP(str, name) ops[str] = (void(*)(OP_PARAM_TYPE))&name;
 
 namespace Commands
 {
