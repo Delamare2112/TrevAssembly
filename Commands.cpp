@@ -13,6 +13,24 @@ size_t GetBytesNeeded(uint32_t val)
 	return 0;
 }
 
+std::vector<std::string> SearchMaches(std::string str, std::string regexStr)
+{
+	std::smatch matches;
+	std::regex regex(regexStr);
+	std::vector<std::string> retVector;
+	while(std::regex_search(str, matches, regex))
+	{
+		std::string arg = std::string(matches[0].first, matches[0].second);
+		if(arg[0] == '\"')
+			for(int i = 1; i < arg.length() - 1; i++)
+				retVector.push_back(std::string(1, arg[i]));
+		else
+			retVector.push_back(arg);
+		str = matches.suffix().str();
+	}
+	return retVector;
+}
+
 namespace Commands
 {
 	Command Command::currentCommand;
@@ -25,13 +43,35 @@ namespace Commands
 		std::cout << "-->";
 		std::getline(std::cin , retCommand.raw);
 		std::smatch matches;
-		std::regex_match(retCommand.raw, matches, std::regex("^([a-zA-Z]+)(?: +([^,]+))?(?:, +([^,]+))?(?:, +([^,]+))?$"));
+		// Command parse
+		std::regex_match(retCommand.raw, matches, std::regex("^([a-zA-Z]+)(?: )?(?:[ ,]+)?(.+)?"));
+		// for(auto i : matches)
+		// 	std::cout << "arg: " << i << '\n';
 		retCommand.op = matches[1];
-		for(size_t i = 2; i < matches.size(); i++)
+
+		// Argument parse
+		// std::cout << "\nnow doing: " << std::string(matches[2]) << '\n';
+		retCommand.args = SearchMaches(matches[2], "([^, ]+)");
+
+		// mem parse
+		if(Commands::ops.find(retCommand.op) == Commands::ops.end())
 		{
-			if(matches[i] != "")
-				retCommand.args.push_back(matches[i]);
+			// std::cout << retCommand.op << " not found, attempting memcreate syntax\n";
+			retCommand.args.clear();
+			std::regex_match(retCommand.raw, matches, std::regex("^([a-zA-Z]+) ([a-zA-Z]+) (.+)"));
+			// for(auto i : matches)
+			// 	std::cout << "arg: " << i << '\n';
+			retCommand.op = matches[2];
+			retCommand.args.push_back(matches[1]);
+
+			// Argument parse
+			std::string strArgs = matches[3];
+			// std::cout << "\nnow doing: " << strArgs << '\n';
+			retCommand.args = SearchMaches(matches[3], "([^, ]+)");
+			// for(std::string s : retCommand.args)
+			// 	std::cout << s << '\n';
 		}
+
 		commandHistory.push_back(retCommand);
 		return retCommand;
 	}
