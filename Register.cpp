@@ -115,7 +115,7 @@ Register& Register::GetReg(std::string regname)
 	auto regIter = registers.find(regname);
 	if(regIter != registers.end())
 		return regIter->second;
-	std::cout << "Register with name '" << regname + "' could not be found\n";
+	// std::cout << "Register with name '" << regname + "' could not be found\n";
 	return Register::dummyReg;
 }
 

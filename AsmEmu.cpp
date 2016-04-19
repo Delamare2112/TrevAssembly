@@ -1,5 +1,6 @@
 #include "Register.h"
 #include "ALU.h"
+#include "Memory.h"
 
 using Commands::Command;
 
@@ -7,6 +8,7 @@ int main(int argc, char* argv[])
 {
 	Commands::Init();
 	Commands::ALU::Init();
+	Commands::Memory::Init();
 	Register::Init();
 	std::cout << "Welcome to TrevAssembly! Plz enter asm commands!\n";
 	do

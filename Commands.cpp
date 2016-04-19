@@ -1,4 +1,5 @@
 #include "Commands.h"
+#include "Memory.h"
 #include <cctype>
 #include <regex>
 
@@ -62,15 +63,17 @@ namespace Commands
 			// for(auto i : matches)
 			// 	std::cout << "arg: " << i << '\n';
 			retCommand.op = matches[2];
-			retCommand.args.push_back(matches[1]);
+			// retCommand.args.push_back(matches[1]);
 
 			// Argument parse
 			std::string strArgs = matches[3];
 			// std::cout << "\nnow doing: " << strArgs << '\n';
 			retCommand.args = SearchMaches(matches[3], "([^, ]+)");
-			// for(std::string s : retCommand.args)
-			// 	std::cout << s << '\n';
+			retCommand.args.insert(retCommand.args.begin(), matches[1]);
 		}
+
+		for(std::string s : retCommand.args)
+			std::cout << s << '\n';
 
 		commandHistory.push_back(retCommand);
 		return retCommand;
@@ -101,7 +104,11 @@ namespace Commands
 
 	void mov(std::string dest, std::string src)
 	{
-		mov(dest, Register::GetReg(src).GetValue());
+		Register& reg = Register::GetReg(src);
+		if(reg.GetSize() != 0)
+			mov(dest, reg.GetValue());
+		else
+			mov(dest, Memory::GetMem<uint32_t>(Memory::labels[src]));
 	}
 
 	void mov(OP_PARAM_TYPE args)
