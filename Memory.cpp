@@ -16,25 +16,10 @@ namespace Commands { namespace Memory
 	}
 
 	template <typename T>
-	std::vector<char> ToBytes(std::vector<T> values)
-	{
-		std::vector<char> ret;
-		for(T thing : values)
-		{
-			for(uint i=0; i < sizeof(T); i++)
-			{
-				ret.push_back(*((&thing)+i));
-			}
-		}
-	}
-
-	template <typename T>
 	void PutMem(std::vector<std::string> values) {
 		for(std::string v : values) {
-			// for(char byte : ToBytes(v)) {
-				*(T*)(memorySegments[PC / MemSegmentSize] + PC % MemSegmentSize) = (T)std::stoi(v);
-				IncrementPC(sizeof(T));
-			// }
+			*(T*)(memorySegments[PC / MemSegmentSize] + PC % MemSegmentSize) = (T)std::stoi(v);
+			IncrementPC(sizeof(T));
 		}
 	}
 
@@ -59,8 +44,6 @@ namespace Commands { namespace Memory
 	void Init()
 	{
 		memorySegments.push_back(new char[MemSegmentSize]);
-		Register::flags.SetBit(FlagMask::parity, 1);
-		Register::flags.SetBit(FlagMask::zero, 1);
 		ADD_OP("BYTE", BYTE);
 		ADD_OP("WORD", WORD);
 		ADD_OP("DWORD", DWORD);
