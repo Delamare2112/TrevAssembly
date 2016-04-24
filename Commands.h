@@ -20,6 +20,7 @@ namespace Commands
 	};
 	extern std::unordered_map<std::string, std::function<void(OP_PARAM_TYPE)>> ops;
 	extern std::vector<Command> commandHistory;
+	extern bool verbose;
 	void Init();
 	void mov(Register& dest, uint32_t val);
 	void mov(std::string dest, uint32_t val);

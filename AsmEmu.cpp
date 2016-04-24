@@ -6,6 +6,7 @@ using Commands::Command;
 
 int main(int argc, char* argv[])
 {
+	Commands::verbose = argc > 1 && (std::string)argv[1] == "-v";
 	Commands::Init();
 	Commands::ALU::Init();
 	Commands::Memory::Init();

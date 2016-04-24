@@ -37,6 +37,7 @@ namespace Commands
 	Command Command::currentCommand;
 	std::unordered_map<std::string, std::function<void(OP_PARAM_TYPE)>> ops;
 	std::vector<Command> commandHistory;
+	bool verbose = false;
 
 	Command GetCommand()
 	{
@@ -72,8 +73,9 @@ namespace Commands
 			retCommand.args.insert(retCommand.args.begin(), matches[1]);
 		}
 
-		for(std::string s : retCommand.args)
-			std::cout << s << '\n';
+		if(verbose)
+			for(std::string s : retCommand.args)
+				std::cout << s << '\n';
 
 		commandHistory.push_back(retCommand);
 		return retCommand;
