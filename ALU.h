@@ -21,5 +21,10 @@ namespace Commands { namespace ALU
 	void _or(OP_PARAM_TYPE args);
 	void cld(OP_PARAM_TYPE args);
 	void std(OP_PARAM_TYPE args);
+	void mul(OP_PARAM_TYPE args);
+	void mul(std::string dest, std::string src);
+	void mul(std::string dest, uint32_t src);
+	void neg(OP_PARAM_TYPE args);
+	void neg(std::string args);
 	void Init();
 }}

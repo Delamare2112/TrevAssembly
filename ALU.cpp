@@ -182,6 +182,48 @@ namespace Commands { namespace ALU
 		Register::flags.SetBit(FlagMask::direction, 1);
 	}
 
+	void neg(std::string args)
+	{
+		Register& destReg = Register::GetReg(args);
+		mov(args, destReg.GetValue() * -1);
+	}
+
+	void neg(OP_PARAM_TYPE args)
+	{
+		
+		if(args.size() != 1)
+		{
+			std::cout << "\nError: neg takes 1 arguments. neg [reg/mem]\n";
+			return;
+		}
+		neg(args[0]);
+	}
+
+	void mul(std::string dest, uint32_t src)
+	{
+		mov(dest, Register::GetReg(dest).GetValue() * src);
+	}
+
+
+	void mul(std::string dest, std::string src)
+	{
+		mul(dest, Register::GetReg(src).GetValue());
+	}
+
+	void mul(OP_PARAM_TYPE args)
+	{
+
+		if(args.size() != 2)
+		{
+			std::cout << "\nError: mul takes 2 arguments. mul [reg/mem], [reg/mem/val]\n";
+			return;
+		}
+		if(std::isdigit(args[1][0])) // is first character of the second arg a number?
+			mul(args[0], std::stoi(args[1]));
+		else
+			mul(args[0], args[1]);
+	}
+
 	void Init()
 	{
 		Register::flags.SetBit(FlagMask::parity, 1);
@@ -193,5 +235,7 @@ namespace Commands { namespace ALU
 		ADD_OP("and", _and);
 		ADD_OP("or", _or);
 		ADD_OP("not", _not);
+		ADD_OP("neg", neg);
+		ADD_OP("mul", mul);
 	}
 }}
